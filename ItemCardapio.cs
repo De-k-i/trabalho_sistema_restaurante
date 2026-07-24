@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,12 +12,13 @@ namespace Trabaio
         public int Id { get; private set; }
         public string Nome { get; set; }
         public Categoria Categoria { get; set; }
+        private decimal _precoBase;
         public decimal PrecoBase {
-            get => PrecoBase;
+            get => _precoBase;
             private set
             {
                 if (value <= 0) throw new ArgumentException("Preço deve ser maior que R$ 0,00.");
-                PrecoBase = value;
+                _precoBase = value;
             }
         }
         public bool EstaDisponivel { get; private set; }
@@ -51,6 +52,11 @@ namespace Trabaio
         public void AlterarPrecoBase(decimal novoPreco)
         {
             PrecoBase = novoPreco;
+        }
+
+        public override string ToString()
+        {
+            return $"{Id} - {Nome} - R$ {PrecoBase:N2} - {(EstaDisponivel ? "Disponível" : "Indisponível")}";
         }
     }
 }
