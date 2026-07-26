@@ -1,0 +1,9 @@
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/bin/Debug/net472/Trabaio.exe.config
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/bin/Debug/net472/Trabaio.exe
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/bin/Debug/net472/Trabaio.pdb
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/Debug/net472/Trabaio.csproj.AssemblyReference.cache
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/Debug/net472/Trabaio.AssemblyInfoInputs.cache
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/Debug/net472/Trabaio.AssemblyInfo.cs
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/Debug/net472/Trabaio.csproj.CoreCompileInputs.cache
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/Debug/net472/Trabaio.exe
+/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/Debug/net472/Trabaio.pdb

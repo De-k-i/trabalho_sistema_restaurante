@@ -1,0 +1,45 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/Trabaio.csproj": {}
+  },
+  "projects": {
+    "/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/Trabaio.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/Trabaio.csproj",
+        "projectName": "Trabaio",
+        "projectPath": "/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/Trabaio.csproj",
+        "packagesPath": "/home/deki/.nuget/packages/",
+        "outputPath": "/home/deki/Documents/Projetos/C#/trabalho_sistema_restaurante/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/deki/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net472",
+          "runtimeIdentifierGraphPath": "/usr/lib/mono/msbuild/Current/bin/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

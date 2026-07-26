@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Trabaio
 {
     internal class Program
     {
+        static List<ItemCardapio> listaCardapio = new List<ItemCardapio>();
+        static int idx = 1;
+
         static void Main(string[] args)
         {
-            List<ItemCardapio> listaCardapio = new List<ItemCardapio>();
             while (true)
             {
                 Console.Clear();
@@ -20,67 +20,297 @@ namespace Trabaio
                 Console.WriteLine("3) Alterar Preço / Aplicar Desconto");
                 Console.WriteLine("4) Pausar / Reativar Vendas");
                 Console.WriteLine("5) Remover Itens");
-                Console.WriteLine("6) Sair");
-                Console.Write("Opção: ");
-                if (!int.TryParse(Console.ReadLine(), out int opcao)) { Console.WriteLine("Entrada inválida."); continue; }
-                if (opcao == 6) break;
+                Console.WriteLine("0) Sair");
+                Console.Write("\nOpção: ");
+
+                if (!int.TryParse(Console.ReadLine(), out int opcao))
+                {
+                    ExibirMensagemErro("Entrada inválida.");
+                    continue;
+                }
+
+                if (opcao == 0) break;
+
                 switch (opcao)
                 {
                     case 1:
-                        CadastrarProduto(listaCardapio);
+                        CadastrarProduto();
                         break;
                     case 2:
-                        ListarProdutos(listaCardapio);
+                        ListarProdutos();
                         break;
                     case 3:
+                        MenuAlterarPreco();
                         break;
                     case 4:
+                        AlternarDisponibilidade();
                         break;
                     case 5:
+                        RemoverProduto();
                         break;
                     default:
+                        ExibirMensagemErro("Opção inválida.");
                         break;
                 }
             }
         }
-        static void CadastrarProduto(List<ItemCardapio> lista)
+
+        static void CadastrarProduto()
         {
             Console.Clear();
-            Console.WriteLine("Informe o nome do produto: ");
+            Console.WriteLine("***** CADASTRAR PRODUTO *****\n");
+            Console.Write("Informe o nome do produto: ");
             string nome = Console.ReadLine();
-            Console.WriteLine("Selecione a categoria do produto: ");
+
             Categoria categoria;
             while (true)
             {
+                Console.WriteLine("\nSelecione a categoria do produto:");
                 Console.WriteLine("1 - Hambúrguer\n2 - Acompanhamento\n3 - Adicional\n4 - Sobremesa\n5 - Bebida");
-                Console.Write("Opção: ");
-                if (int.TryParse(Console.ReadLine(), out int opcao) && Enum.IsDefined(typeof(Categoria), opcao))
+                Console.Write("\nOpção: ");
+                if (int.TryParse(Console.ReadLine(), out int opcao))
                 {
                     categoria = (Categoria)opcao;
                     break;
                 }
-                Console.WriteLine("Opção inválida.");
+
+                ExibirMensagemErro("Opção inválida.");
             }
+
             decimal preco;
             while (true)
             {
-                Console.WriteLine("Informe o preço do produto: ");
-                if (decimal.TryParse(Console.ReadLine(), out preco)) break;
-                Console.WriteLine("Por favor informe um preço válido.");
+                Console.Write("\nInforme o preço do produto (R$): ");
+                if (decimal.TryParse(Console.ReadLine(), out preco) && preco > 0) break;
+                ExibirMensagemErro("Por favor, informe um preço válido maior que zero.");
             }
-            lista.Add(new ItemCardapio(lista.Count+1,nome, categoria, preco));
-            Console.WriteLine("***** PRODUTO CADASTRADO *****");
-            Console.ReadKey();
+
+            listaCardapio.Add(new ItemCardapio(idx++, nome, categoria, preco));
+            ExibirMensagemSucesso("Produto cadastrado com sucesso!");
         }
 
-        static void ListarProdutos(List<ItemCardapio> lista)
+        static void ListarProdutos()
         {
             Console.Clear();
             Console.WriteLine("***** CARDÁPIO *****");
-            foreach (var item in lista)
+            
+            if (listaCardapio.Count == 0)
             {
-                Console.WriteLine(item);
+                Console.WriteLine("\nNenhum produto cadastrado no momento.");
             }
+            else
+            {
+                ExibirResumoCardapio();
+            }
+
+            PressionarParaContinuar();
+        }
+
+        static void MenuAlterarPreco()
+        {
+            Console.Clear();
+            Console.WriteLine("***** ALTERAR PREÇO / APLICAR DESCONTO *****");
+            ExibirResumoCardapio();
+            
+            ItemCardapio item = BuscarPorId();
+            if (item != null)
+            {
+                AlterarPreco(item);
+            }
+        }
+
+        static void AlternarDisponibilidade()
+        {
+            Console.Clear();
+            Console.WriteLine("***** PAUSAR / REATIVAR VENDAS *****");
+            ExibirResumoCardapio();
+            
+            ItemCardapio item = BuscarPorId();
+            if (item == null) return;
+            
+            Console.WriteLine($"\nProduto Selecionado: {item.Nome}");
+            Console.WriteLine($"Status Atual: {(item.EstaDisponivel ? "Disponível" : "Pausado")}\n");
+            Console.WriteLine("1) Pausar Vendas");
+            Console.WriteLine("2) Reativar Vendas");
+            Console.Write("\nEscolha uma ação: ");
+
+            if (int.TryParse(Console.ReadLine(), out int acao))
+            {
+                if (acao == 1)
+                {
+                    item.PausarVendas();
+                    ExibirMensagemSucesso($"Vendas de '{item.Nome}' foram PAUSADAS.");
+                }
+                else if (acao == 2)
+                {
+                    item.ReativarVendas();
+                    ExibirMensagemSucesso($"Vendas de '{item.Nome}' foram REATIVADAS.");
+                }
+                else
+                {
+                    ExibirMensagemErro("Ação inválida.");
+                }
+            }
+            else
+            {
+                ExibirMensagemErro("Entrada inválida.");
+            }
+        }
+
+        static void RemoverProduto()
+        {
+            Console.Clear();
+            Console.WriteLine("***** REMOVER PRODUTO *****");
+            ExibirResumoCardapio();
+            
+            ItemCardapio item = BuscarPorId();
+            if (item == null) return;
+
+            Console.Write($"\nTem certeza que deseja remover '{item.Nome}' (ID: {item.Id})? (S/N): ");
+            string confirmacao = Console.ReadLine()?.Trim().ToUpper();
+
+            if (confirmacao == "S")
+            {
+                listaCardapio.Remove(item);
+                ExibirMensagemSucesso($"Produto '{item.Nome}' removido com sucesso!");
+            }
+            else
+            {
+                ExibirMensagemErro("Operação de remoção cancelada.");
+            }
+        }
+
+        static void ExibirResumoCardapio()
+        {
+            Console.WriteLine("\n***** ITENS REGISTRADOS *****");
+            
+            if (listaCardapio.Count == 0)
+            {
+                Console.WriteLine("(Nenhum produto cadastrado no momento)");
+            }
+            else
+            {
+                foreach (var item in listaCardapio)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+
+            Console.WriteLine("---------------------------\n");
+        }
+
+        static ItemCardapio BuscarPorId()
+        {
+            if (listaCardapio.Count == 0)
+            {
+                ExibirMensagemErro("Não há produtos cadastrados.");
+                return null;
+            }
+
+            Console.Write("Informe o ID do produto: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var item = listaCardapio.FirstOrDefault(x => x.Id == id);
+                if (item == null) ExibirMensagemErro($"Produto com ID {id} não encontrado.");
+                return item;
+            }
+
+            ExibirMensagemErro("ID inválido.");
+            return null;
+        }
+
+        static void AlterarPreco(ItemCardapio item)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine($"***** ALTERAR PREÇO: {item.Nome.ToUpper()} (ATUAL: {item.PrecoBase:C2}) *****\n");
+                Console.WriteLine("1) Alterar o preço base");
+                Console.WriteLine("2) Reduzir o preço base por porcentagem");
+                Console.WriteLine("3) Incrementar o preço base por porcentagem");
+                Console.WriteLine("0) Voltar");
+                Console.Write("\nOpção: ");
+
+                if (!int.TryParse(Console.ReadLine(), out int opcao))
+                {
+                    ExibirMensagemErro("Opção inválida. Digite um número.");
+                    continue;
+                }
+
+                if (opcao == 0) break;
+
+                try
+                {
+                    switch (opcao)
+                    {
+                        case 1:
+                            if (LerDecimal("Informe o novo preço (R$): ", out decimal novoPreco))
+                            {
+                                item.AlterarPrecoBase(novoPreco);
+                                ExibirMensagemSucesso($"Preço alterado com sucesso para {item.PrecoBase:C2}!");
+                            }
+                            break;
+
+                        case 2:
+                            if (LerDecimal("Informe a porcentagem de desconto (%): ", out decimal percentualDesconto))
+                            {
+                                item.AplicarDesconto(percentualDesconto);
+                                ExibirMensagemSucesso($"Desconto aplicado! Novo preço: {item.PrecoBase:C2}");
+                            }
+                            break;
+
+                        case 3:
+                            if (LerDecimal("Informe a porcentagem de aumento (%): ", out decimal percentualAumento))
+                            {
+                                item.AplicarAcrescimo(percentualAumento);
+                                ExibirMensagemSucesso($"Aumento aplicado! Novo preço: {item.PrecoBase:C2}");
+                            }
+                            break;
+
+                        default:
+                            ExibirMensagemErro("Opção inválida.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExibirMensagemErro($"Erro de Validação: {ex.Message}");
+                }
+            }
+        }
+
+        static bool LerDecimal(string mensagemPrompt, out decimal valor)
+        {
+            Console.Write($"\n{mensagemPrompt}");
+            if (decimal.TryParse(Console.ReadLine(), out valor))
+            {
+                return true;
+            }
+
+            ExibirMensagemErro("Valor numérico inválido.");
+            valor = 0;
+            return false;
+        }
+
+        static void ExibirMensagemSucesso(string mensagem)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n[SUCESSO] {mensagem}");
+            Console.ResetColor();
+            PressionarParaContinuar();
+        }
+
+        static void ExibirMensagemErro(string mensagem)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n[ERRO] {mensagem}");
+            Console.ResetColor();
+            PressionarParaContinuar();
+        }
+
+        static void PressionarParaContinuar()
+        {
+            Console.WriteLine("\nPressione qualquer tecla para continuar...");
             Console.ReadKey();
         }
     }

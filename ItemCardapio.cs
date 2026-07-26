@@ -1,26 +1,56 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Trabaio
 {
     internal class ItemCardapio
     {
-        public int Id { get; private set; }
-        public string Nome { get; set; }
-        public Categoria Categoria { get; set; }
+        private int _id;
+        private string _nome;
         private decimal _precoBase;
-        public decimal PrecoBase {
+        private Categoria _categoria;
+
+        public int Id
+        {
+            get => _id;
+            private set
+            {
+                if (value <= 0) throw new ArgumentOutOfRangeException("ID deve ser maior que zero.", nameof(value));
+                _id = value;
+            }
+        }
+
+        public string Nome
+        {
+            get => _nome;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("O nome do item não pode ser vazio ou nulo.", nameof(value));
+                _nome = value.Trim();
+            }
+        }
+
+        public Categoria Categoria
+        {
+            get => _categoria;
+            private set
+            {
+                if (!Enum.IsDefined(typeof(Categoria), value)) throw new ArgumentException("Categoria inválida.", nameof(value));
+                _categoria =  value;
+            }
+        }
+
+        public decimal PrecoBase
+        {
             get => _precoBase;
             private set
             {
-                if (value <= 0) throw new ArgumentException("Preço deve ser maior que R$ 0,00.");
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(value), "Preço deve ser maior que R$ 0,00.");
                 _precoBase = value;
             }
         }
+
         public bool EstaDisponivel { get; private set; }
 
         public ItemCardapio(int id, string nome, Categoria categoria, decimal precoBase)
@@ -42,21 +72,35 @@ namespace Trabaio
             EstaDisponivel = true;
         }
 
-        public decimal AplicarDesconto(decimal porcentagem)
-        {
-            if (porcentagem <= 0) throw new ArgumentOutOfRangeException("Desconto deve ser superior a 0%.");
-            if (porcentagem > 30) throw new ArgumentOutOfRangeException("Desconto deve ser igual ou inferior a 30%.");
-            return PrecoBase * (1 - porcentagem / 100);
-        }
-
         public void AlterarPrecoBase(decimal novoPreco)
         {
             PrecoBase = novoPreco;
         }
 
+        public void AplicarDesconto(decimal porcentagem)
+        {
+            if (porcentagem <= 0)
+                throw new ArgumentOutOfRangeException(nameof(porcentagem), "Desconto deve ser superior a 0%.");
+            if (porcentagem > 30)
+                throw new ArgumentOutOfRangeException(nameof(porcentagem),
+                    "Desconto deve ser igual ou inferior a 30%.");
+
+            PrecoBase = PrecoBase * (1 - porcentagem / 100);
+        }
+
+        public void AplicarAcrescimo(decimal porcentagem)
+        {
+            if (porcentagem <= 0)
+                throw new ArgumentOutOfRangeException(nameof(porcentagem),
+                    "A porcentagem de aumento deve ser maior que zero.");
+
+            PrecoBase = PrecoBase * (1 + porcentagem / 100);
+        }
+
         public override string ToString()
         {
-            return $"{Id} - {Nome} - R$ {PrecoBase:N2} - {(EstaDisponivel ? "Disponível" : "Indisponível")}";
+            return
+                $"[{Id}] {Nome} ({Categoria}) - {PrecoBase:C2} - STATUS: {(EstaDisponivel ? "Disponível" : "Pausado")}";
         }
     }
 }
